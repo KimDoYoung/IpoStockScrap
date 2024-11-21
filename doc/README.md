@@ -28,12 +28,17 @@ db.tablename=public.ipo_data
 http://www.ipostock.co.kr/sub03/ipo04.asp?str1=2024&str2=all&str3=&str4=&page=1
 http://www.ipostock.co.kr/sub03/ipo04.asp?str1=2024&str2=all&str3=&str4=&page=2
 http://www.ipostock.co.kr/sub03/ipo04.asp?str1=2024&str2=all&str3=&str4=&page=3  
+
 2. 각 페이지에서 앵커 추출
 <a href="/view_pg/view_04.asp?code=B202405201&amp;schk=2">
+
 3. 각 앵커에서 B202405201 코드추출
+
 4. 수집된 앵커 리스트를 순회하면서 아래 페이지 접속
 	http://www.ipostock.co.kr/view_pg/view_04.asp?code=B202405271&schk=2
+	
 5. 페이지에서 데이터 추출
+
 6. 모든 데이터를 추출 후 db에 저장
 
 	
