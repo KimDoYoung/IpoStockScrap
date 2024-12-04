@@ -24,10 +24,12 @@ public class Main {
             List<IpoData> dataList = new ArrayList<>();
 
             // 스크래핑
-            // 1단계 리스트페이지에서 코드 추출
+            // 1단계 리스트페이지에서 코드 추출	
             List<String> codeList = new ArrayList<>();
             for (int page = 1; page <= 3; page++) {
-                String url = "http://www.ipostock.co.kr/sub03/ipo04.asp?str1=2024&str2=all&str3=&str4=&page=" + page;
+            	//올해의 년도
+            	String year = new SimpleDateFormat("yyyy").format(new Date()); 
+                String url = "http://www.ipostock.co.kr/sub03/ipo04.asp?str1=" + year + "&str2=all&str3=&str4=&page=" + page;
                 List<String> codes = scraper.scrapeAnchors(url);
                 //System.out.println("codes : " +  String.join(",", codes));
                 codeList.addAll(codes);

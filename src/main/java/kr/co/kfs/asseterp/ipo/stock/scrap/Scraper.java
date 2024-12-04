@@ -15,7 +15,7 @@ public class Scraper {
     public List<String> scrapeAnchors(String url) throws IOException {
         List<String> codes = new ArrayList<>();
         Document doc = Jsoup.connect(url).get();
-        Elements anchors = doc.select("a[href*=/view_pg/view_04.asp]");
+        Elements anchors = doc.select("a[href*=/view_pg/view_]");
         for (Element anchor : anchors) {
             String href = anchor.attr("href");
             String code = href.split("code=")[1].split("&")[0];
@@ -29,6 +29,13 @@ public class Scraper {
         Document doc = Jsoup.connect(url).get();
         IpoData ipoData = new IpoData();        
         // stockname, code  추출
+        Element table = findHeaderTable(doc);
+		if (table != null) {
+			String market_type = findMargetTypeInHeaderTable(table);
+			String status = findStatusInHeaderTable(table);
+			ipoData.setMarketType(market_type);
+			ipoData.setStatus(status);
+		}
         ipoData.setStockName(findWithCssQuery(doc, "strong.view_tit"));
         ipoData.setStockCode(findWithCssQuery(doc, "strong.view_txt01"));
         
@@ -48,8 +55,8 @@ public class Scraper {
         //주관사
         String leadManager = findLeadManager(doc);
         ipoData.setLeadManager(leadManager);
-        //수
-        Element table = findScheduleTable(doc);
+        //수요예측등 
+        table = findScheduleTable(doc);
         if (table != null) {
         	text = findInElement(table,"td:contains(수요예측일) + td");
         	ipoData.setDemandForecastDate(text);
@@ -70,7 +77,71 @@ public class Scraper {
         }
         return ipoData;
     }
-    private String findInElement(Element elm, String cssQuery) {
+    /**
+     * 헤더테이블에서 공모철회가 있는지 찾는다.
+     * @param table
+     * @return
+     */
+    private String findStatusInHeaderTable(Element table) {
+    	Elements tds = table.select("td[align=right][valign=bottom]");
+        for (Element td : tds) {
+            // td 텍스트 추출
+            String text = td.text().trim(); // 공백 제거
+            // "공모철회" 판별
+            if (text.contains("공모철회")) {
+                return "공모철회";	
+            } 
+        }
+        return null;
+	}
+
+	/**
+     * 헤더테이블의 이미지를 보고 시장구분을 찾는다
+	 * <img src="/image/contents/co.gif" /> 코스닥
+     * <img src="/image/contents/u.gif" /> 유가증권
+     * <img src="/image/contents/f.jpg" /> 코넥스
+     * 
+     * @param table
+     * @return
+     */
+    private String findMargetTypeInHeaderTable(Element table) {
+    	 Element img = table.selectFirst("img");
+         String imgSrc = img.attr("src");
+         if (imgSrc.contains("co.gif")) {
+             return "코스닥";
+         } else if (imgSrc.contains("u.gif")) {
+             return "유가증권";
+         } else if (imgSrc.contains("f.jpg")) {
+             return "코넥스";
+         } else {
+             return "Unknown";
+         }         
+	}
+
+	/**
+     * 회사명과 종목코드를 갖고 있는 테이블을 찾는다.
+     * @param doc
+     * @return
+     */
+    private Element findHeaderTable(Document doc) {
+        try {
+            // 조건에 맞는 테이블 찾기
+            Element table = doc.selectFirst("table:has(td:has(strong.view_tit))");
+
+            if (table != null) {
+                System.out.println("헤더 테이블 찾음!");
+                return table; // 첫 번째로 찾은 테이블 반환
+            } else {
+                System.out.println("조건에 맞는 헤더 테이블을 찾을 수 없습니다.");
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("오류 발생: " + e.getMessage());
+            return null;
+        }
+	}
+
+	private String findInElement(Element elm, String cssQuery) {
 		Element found = elm.selectFirst(cssQuery);
 		return found != null ? found.text() : "";
     }
