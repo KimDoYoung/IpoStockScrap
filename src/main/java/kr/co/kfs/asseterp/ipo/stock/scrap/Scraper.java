@@ -125,8 +125,13 @@ public class Scraper {
      */
     private Element findHeaderTable(Document doc) {
         try {
+        	Element mainTable = doc.selectFirst("table");
+        	if(mainTable == null) {
+        		System.out.println("메인 테이블을 찾을 수 없습니다.");
+        		return null;
+        	}
             // 조건에 맞는 테이블 찾기
-            Element table = doc.selectFirst("table:has(td:has(strong.view_tit))");
+            Element table = mainTable.selectFirst("table:has(td:has(strong.view_tit))");
 
             if (table != null) {
                 System.out.println("헤더 테이블 찾음!");

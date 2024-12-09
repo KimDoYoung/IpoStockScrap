@@ -37,7 +37,7 @@ public class Main {
             }
             // 2단계 코드로 상세페이지 스크래핑
             for (String code : codeList) {
-            	String url = "http://www.ipostock.co.kr/view_pg/view_04.asp?code=" + code + "&schk=2";
+            	String url = "http://www.ipostock.co.kr/view_pg/view_04.asp?code=" + code;
             	System.out.println("스크래핑 url : " + url);
                 IpoData data = scraper.scrapeDetails(url);
                 dataList.add(data);
